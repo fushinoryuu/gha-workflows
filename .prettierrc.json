@@ -4,11 +4,13 @@
   "trailingComma": "none",
   "bracketSpacing": true,
   "tabWidth": 4,
-  "endOfLine": "lf",
+  "endOfLine": "auto",
   "semi": true,
+  "embeddedLanguageFormatting": "off",
+  "proseWrap": "preserve",
   "overrides": [
     {
-      "files": ["*.yml", "*.yaml", "*.json"],
+      "files": ["*.yml", "*.yaml", "*.json", "*.md"],
       "options": {
         "tabWidth": 2
       }

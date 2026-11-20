@@ -1,0 +1,20 @@
+name: 'Save Docker Image to Cache'
+description: 'Save image to repo cache'
+
+inputs:
+  cache-key:
+    description: 'Cache key for the image'
+    required: true
+  full-image-name:
+    description: 'Full image name including tag'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Check if image exists in cache
+      id: check-docker-cache
+      uses: actions/cache@v4
+      with:
+        path: ci/cache/docker
+        key: ${{ inputs.cache-key }}

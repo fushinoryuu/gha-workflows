@@ -12,22 +12,37 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    # Each image gets its own directory, so calling this action more than once in
+    # a job doesn't put one image's tarball into another image's cache. The
+    # directory name comes from the image name with unsafe characters replaced.
+    - name: Get cache directory for image
+      id: cache-dir
+      shell: bash
+      env:
+        IMAGE: ${{ inputs.full-image-name }}
+      run: echo "path=ci/cache/docker/${IMAGE//[^a-zA-Z0-9_.-]/_}" >> "$GITHUB_OUTPUT"
+
     - name: Check if image exists in cache
       id: check-docker-cache
       uses: actions/cache@v4
       with:
-        path: ci/cache/docker
+        path: ${{ steps.cache-dir.outputs.path }}
         key: ${{ inputs.cache-key }}
 
     - name: Update image cache on cache miss
       if: steps.check-docker-cache.outputs.cache-hit != 'true'
-      shell: pwsh
+      shell: bash
+      env:
+        IMAGE: ${{ inputs.full-image-name }}
+        CACHE_DIR: ${{ steps.cache-dir.outputs.path }}
       run: |
-        docker pull ${{ inputs.full-image-name }}
-        mkdir -p ci/cache/docker
-        docker image save ${{ inputs.full-image-name }} --output ./ci/cache/docker/${{ inputs.cache-key }}.tar
+        docker pull "$IMAGE"
+        mkdir -p "$CACHE_DIR"
+        docker image save "$IMAGE" --output "$CACHE_DIR/image.tar"
 
     - name: Use image from cache on cache hit
       if: steps.check-docker-cache.outputs.cache-hit == 'true'
-      shell: pwsh
-      run: docker image load --input ./ci/cache/docker/${{ inputs.cache-key }}.tar
+      shell: bash
+      env:
+        CACHE_DIR: ${{ steps.cache-dir.outputs.path }}
+      run: docker image load --input "$CACHE_DIR/image.tar"

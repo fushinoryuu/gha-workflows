@@ -1,0 +1,50 @@
+name: 'Cache Docker Image'
+description: 'Restore a Docker image from the repo cache, or pull it and save it to the cache on a miss'
+
+inputs:
+  cache-key:
+    description: 'Cache key for the image'
+    required: true
+  full-image-name:
+    description: 'Full image name including tag'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    # Each image gets its own directory, so calling this action more than once in
+    # a job doesn't put one image's tarball into another image's cache. The
+    # directory name comes from the image name with unsafe characters replaced.
+    - name: Get cache directory for image
+      id: cache-dir
+      shell: bash
+      env:
+        IMAGE: ${{ inputs.full-image-name }}
+      run: echo "path=ci/cache/docker/${IMAGE//[^a-zA-Z0-9_.-]/_}" >> "$GITHUB_OUTPUT"
+
+    # Restores the cache on a hit. On a miss, the post-job step of this action
+    # saves the directory after the image has been written to it below.
+    - name: Restore image cache
+      id: check-docker-cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.cache-dir.outputs.path }}
+        key: ${{ inputs.cache-key }}
+
+    - name: Pull image and write it to the cache directory on cache miss
+      if: steps.check-docker-cache.outputs.cache-hit != 'true'
+      shell: bash
+      env:
+        IMAGE: ${{ inputs.full-image-name }}
+        CACHE_DIR: ${{ steps.cache-dir.outputs.path }}
+      run: |
+        docker pull "$IMAGE"
+        mkdir -p "$CACHE_DIR"
+        docker image save "$IMAGE" | gzip > "$CACHE_DIR/image.tar.gz"
+
+    - name: Use image from cache on cache hit
+      if: steps.check-docker-cache.outputs.cache-hit == 'true'
+      shell: bash
+      env:
+        CACHE_DIR: ${{ steps.cache-dir.outputs.path }}
+      run: gzip -dc "$CACHE_DIR/image.tar.gz" | docker image load

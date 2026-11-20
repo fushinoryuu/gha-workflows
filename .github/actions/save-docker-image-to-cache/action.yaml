@@ -18,3 +18,16 @@ runs:
       with:
         path: ci/cache/docker
         key: ${{ inputs.cache-key }}
+
+    - name: Update image cache on cache miss
+      if: steps.check-docker-cache.outputs.cache-hit != 'true'
+      shell: pwsh
+      run: |
+        docker pull ${{ inputs.full-image-name }}
+        mkdir -p ci/cache/docker
+        docker image save ${{ inputs.full-image-name }} --output ./ci/cache/docker/${{ inputs.cache-key }}.tar
+
+    - name: Use image from cache on cache hit
+      if: steps.check-docker-cache.outputs.cache-hit == 'true'
+      shell: pwsh
+      run: docker image load --input ./ci/cache/docker/${{ inputs.cache-key }}.tar

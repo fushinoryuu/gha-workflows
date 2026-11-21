@@ -13,12 +13,12 @@ name: example-workflow-name
 on: workflow_dispatch
 
 jobs:
-    example-job:
+  example-job:
     runs-on: ubuntu-latest
     steps:
-        - name: Restore MySQL Image
-          uses:  fushinoryuu/gha-workflows/.github/actions/cache-docker-image@main
-          with:
-            cache-key: mysql8
-            full-image-name: mysql:8.0
+      - name: Restore MySQL Image
+        uses: fushinoryuu/gha-workflows/.github/actions/cache-docker-image@main
+        with:
+          cache-key: mysql8
+          full-image-name: mysql:8.0
 ```

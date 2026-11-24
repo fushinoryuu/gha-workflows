@@ -1,3 +1,5 @@
+<!-- code-coverage-report -->
+
 **Code Coverage**
 
 |              | Total             | Covered             | Skipped             | %               |

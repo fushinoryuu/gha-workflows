@@ -20,9 +20,31 @@ runs:
           const fs = require('fs');
           const comment = fs.readFileSync('${{ github.action_path }}/coverage-comment.md', 'utf8');
 
-          await github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: comment
+          // The template starts with this hidden marker, which is how we find our
+          // comment from a previous run and update it instead of adding a new one.
+          const marker = '<!-- code-coverage-report -->';
+          const { owner, repo } = context.repo;
+          const issue_number = context.issue.number;
+
+          const comments = await github.paginate(github.rest.issues.listComments, {
+            owner,
+            repo,
+            issue_number
           });
+          const existing = comments.find(c => c.body?.includes(marker));
+
+          if (existing) {
+            await github.rest.issues.updateComment({
+              owner,
+              repo,
+              comment_id: existing.id,
+              body: comment
+            });
+          } else {
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body: comment
+            });
+          }

@@ -1,0 +1,14 @@
+name: 'Code Coverage PR Comment'
+description: 'Comment on a pull request with code coverage information'
+
+inputs:
+  coverage-report-path:
+    description: 'Path to the code coverage report file'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: place-holder
+      shell: bash
+      run: echo "This is a placeholder for the code coverage PR comment action."

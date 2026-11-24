@@ -4,8 +4,7 @@ param (
 )
 
 $coverageReport = Get-Content -Path $CoverageReportPath -Raw | ConvertFrom-Json
-$coverageMarkdownPath = "$PSScriptRoot/coverage-comment.md"
-$coverageMarkdown = Get-content -Path $coverageMarkdownPath -Raw
+$coverageMarkdown = Get-content -Path "$PSScriptRoot/comment-template.md" -Raw
 
 $totals = $coverageReport.totals
 
@@ -45,4 +44,4 @@ $branchesTrue.PSObject.Properties | ForEach-Object {
 # Output the final markdown content
 Write-Host $coverageMarkdown
 
-$coverageMarkdown | Set-Content -Path $coverageMarkdownPath
+$coverageMarkdown | Set-Content -Path "$PSScriptRoot/coverage-comment.md"

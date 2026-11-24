@@ -9,6 +9,6 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: place-holder
-      shell: bash
-      run: echo "This is a placeholder for the code coverage PR comment action."
+    - name: Create coverage comment
+      shell: pwsh
+      run: ${{ github.action_path }}/create-coverage-comment.ps1 -CoverageReportPath ${{ inputs.coverage-report-path }}

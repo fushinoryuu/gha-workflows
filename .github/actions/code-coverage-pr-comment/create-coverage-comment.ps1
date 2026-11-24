@@ -6,7 +6,7 @@ param (
 $coverageReport = Get-Content -Path $CoverageReportPath -Raw | ConvertFrom-Json
 $coverageMarkdown = Get-content -Path "$PSScriptRoot/comment-template.md" -Raw
 
-$totals = $coverageReport.totals
+$totals = $coverageReport.total
 
 # Get the values for each metric
 $lines = $totals.lines

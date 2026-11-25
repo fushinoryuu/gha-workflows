@@ -6,7 +6,7 @@ inputs:
     description: Path to the code coverage report file
     required: true
   test-framework:
-    description: Test framework used to generate the coverage report (e.g., vitest, pytest)
+    description: Test framework used to generate the coverage report (e.g., vitest, pytest, jest)
     required: true
     default: vitest
 
@@ -18,8 +18,8 @@ runs:
       env:
         TEST_FRAMEWORK: ${{ inputs.test-framework }}
       run: |
-        if ($env:TEST_FRAMEWORK -notin @('vitest', 'pytest')) {
-          throw "Unsupported test framework: $env:TEST_FRAMEWORK. Supported frameworks are: vitest, pytest."
+        if ($env:TEST_FRAMEWORK -notin @('vitest', 'pytest', 'jest')) {
+          throw "Unsupported test framework: $env:TEST_FRAMEWORK. Supported frameworks are: vitest, pytest, jest."
         }
 
     # Converts the pytest (coverage.py) report into the same shape that vitest produces,

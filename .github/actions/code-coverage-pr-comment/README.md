@@ -3,13 +3,13 @@
 - Allows the user to post a comment with the current code coverage on their PR.
 - Inputs:
   - coverage-report-path - Path to the code coverage report file.
-  - test-framework - The test framework used in the calling repo. Valid values are vitest and pytest.
+  - test-framework - The test framework used in the calling repo. Valid values are vitest, pytest, and jest.
 
 ## Usage
 
 To use this action, you first have to run your tests and make sure that they output a `coverage-summary.json` file.
 
-Vitest example:
+Vitest/Jest example:
 
 ```yaml
 name: example-workflow-name

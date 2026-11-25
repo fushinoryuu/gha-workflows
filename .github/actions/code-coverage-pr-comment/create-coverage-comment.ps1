@@ -13,7 +13,6 @@ $lines = $totals.lines
 $statements = $totals.statements
 $functions = $totals.functions
 $branches = $totals.branches
-$branchesTrue = $totals.branchesTrue
 
 # Replace the placeholders in the markdown template with the actual values
 $lines.PSObject.Properties | ForEach-Object {

@@ -13,7 +13,6 @@ $lines = $totals.lines
 $statements = $totals.statements
 $functions = $totals.functions
 $branches = $totals.branches
-$branchesTrue = $totals.branchesTrue
 
 # Replace the placeholders in the markdown template with the actual values
 $lines.PSObject.Properties | ForEach-Object {
@@ -33,11 +32,6 @@ $functions.PSObject.Properties | ForEach-Object {
 
 $branches.PSObject.Properties | ForEach-Object {
     $key = "branches" + $_.Name
-    $coverageMarkdown = $coverageMarkdown -replace $key, $_.Value
-}
-
-$branchesTrue.PSObject.Properties | ForEach-Object {
-    $key = "branchesTrue" + $_.Name
     $coverageMarkdown = $coverageMarkdown -replace $key, $_.Value
 }
 

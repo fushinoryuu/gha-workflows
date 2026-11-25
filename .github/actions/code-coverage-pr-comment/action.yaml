@@ -3,15 +3,34 @@ description: 'Comment on a pull request with code coverage information'
 
 inputs:
   coverage-report-path:
-    description: 'Path to the code coverage report file'
+    description: Path to the code coverage report file
     required: true
+  test-framework:
+    description: Test framework used to generate the coverage report (e.g., vitest, pytest, jest)
+    required: true
+    default: vitest
 
 runs:
   using: 'composite'
   steps:
-    - name: Create coverage comment
+    - name: Check test framework
       shell: pwsh
-      run: ${{ github.action_path }}/create-coverage-comment.ps1 -CoverageReportPath ${{ inputs.coverage-report-path }}
+      env:
+        TEST_FRAMEWORK: ${{ inputs.test-framework }}
+      run: |
+        if ($env:TEST_FRAMEWORK -notin @('vitest', 'pytest', 'jest')) {
+          throw "Unsupported test framework: $env:TEST_FRAMEWORK. Supported frameworks are: vitest, pytest, jest."
+        }
+
+    - name: Create coverage comment - Pytest
+      if: ${{ inputs.test-framework == 'pytest' }}
+      shell: pwsh
+      run: ${{ github.action_path }}/create-coverage-comment-pytest.ps1 -CoverageReportPath "${{ inputs.coverage-report-path }}"
+
+    - name: Create coverage comment - Jest/Vitest
+      if: ${{ inputs.test-framework == 'jest' || inputs.test-framework == 'vitest' }}
+      shell: pwsh
+      run: ${{ github.action_path }}/create-coverage-comment-jest-vitest.ps1 -CoverageReportPath "${{ inputs.coverage-report-path }}"
 
     - name: Post comment on PR
       uses: actions/github-script@v9

@@ -13,6 +13,13 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Check test framework
+      shell: pwsh
+      run: |
+        if (${{ inputs.test-framework }} -notin @('vitest', 'pytest')) {
+          throw "Unsupported test framework: ${{ inputs.test-framework }}. Supported frameworks are: vitest, pytest."
+        }
+
     - name: Create coverage comment
       shell: pwsh
       run: ${{ github.action_path }}/create-coverage-comment.ps1 -CoverageReportPath ${{ inputs.coverage-report-path }}

@@ -1,9 +1,6 @@
 param (
     [Parameter(Mandatory = $true)]
-    [string]$CoverageReportPath,
-
-    [Parameter(Mandatory = $true)]
-    [string]$OutputPath
+    [string]$CoverageReportPath
 )
 
 # coverage.py writes an empty-string key (the module-level code) inside each file's "functions"
@@ -87,13 +84,24 @@ else {
     $functions = New-Metric -Total 0 -Covered 0 -Skipped 0 -Pct 'n/a'
 }
 
-# Write the same shape that vitest's coverage-summary.json has, so the rest of the action
-# doesn't need to know which framework produced the report.
-[ordered]@{
-    total = [ordered]@{
-        lines      = $lines
-        statements = $lines
-        functions  = $functions
-        branches   = $branches
+$coverageMarkdown = Get-Content -Path "$PSScriptRoot/comment-template.md" -Raw
+
+$metrics = [ordered]@{
+    lines      = $lines
+    statements = $lines
+    functions  = $functions
+    branches   = $branches
+}
+
+# Replace the placeholders in the markdown template with the actual values
+foreach ($metric in $metrics.GetEnumerator()) {
+    foreach ($property in $metric.Value.GetEnumerator()) {
+        $key = $metric.Key + $property.Key
+        $coverageMarkdown = $coverageMarkdown -replace $key, $property.Value
     }
-} | ConvertTo-Json -Depth 5 | Set-Content -Path $OutputPath
+}
+
+# Output the final markdown content
+Write-Host $coverageMarkdown
+
+$coverageMarkdown | Set-Content -Path "$PSScriptRoot/coverage-comment.md"

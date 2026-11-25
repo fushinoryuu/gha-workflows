@@ -36,11 +36,6 @@ $branches.PSObject.Properties | ForEach-Object {
     $coverageMarkdown = $coverageMarkdown -replace $key, $_.Value
 }
 
-$branchesTrue.PSObject.Properties | ForEach-Object {
-    $key = "branchesTrue" + $_.Name
-    $coverageMarkdown = $coverageMarkdown -replace $key, $_.Value
-}
-
 # Output the final markdown content
 Write-Host $coverageMarkdown
 

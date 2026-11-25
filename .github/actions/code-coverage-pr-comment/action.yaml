@@ -3,8 +3,12 @@ description: 'Comment on a pull request with code coverage information'
 
 inputs:
   coverage-report-path:
-    description: 'Path to the code coverage report file'
+    description: Path to the code coverage report file
     required: true
+  test-framework:
+    description: Test framework used to generate the coverage report (e.g., vitest, pytest)
+    required: true
+    default: vitest
 
 runs:
   using: 'composite'

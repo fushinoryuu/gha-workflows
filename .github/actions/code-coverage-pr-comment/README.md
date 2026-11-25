@@ -3,6 +3,7 @@
 - Allows the user to post a comment with the current code coverage on their PR.
 - Inputs:
   - coverage-report-path - Path to the code coverage report file.
+  - test-framework - The test framework used in the calling repo. Valid values are vitest and pytest.
 
 ## Usage
 
@@ -23,4 +24,5 @@ jobs:
         uses: fushinoryuu/gha-workflows/.github/actions/code-coverage-pr-comment@main
         with:
           coverage-report-path: ./coverage/coverage-summary.json
+          test-framework: vitest
 ```
